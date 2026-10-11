@@ -1,4 +1,4 @@
-// Network Discovery MVP Dashboard JavaScript
+// Network Discovery dashboard
 
 // Initialize Socket.IO connection
 const socket = io();
@@ -390,7 +390,7 @@ function updateGraph() {
     });
   });
 
-  // Add edges (for MVP, connect all to router if exists)
+  // Connect devices to the router when one is present.
   const routerIp = Object.keys(devices).find(
     (ip) =>
       devices[ip].type === "router" ||
@@ -509,7 +509,7 @@ function updateDeviceList() {
               deviceDescriptions[device.type] || device.type
             }</div>
             <div class="device-status status-${device.status}">${device.status}</div>
-            ${(() => { 
+            ${(() => {
               const bw = bandwidth[device.ip];
               if (!bw) return '';
               const inMbps = (bw.rate_in_bps || 0) / 1e6;
@@ -586,5 +586,5 @@ clearBtn.addEventListener("click", function () {
 // Initialize when page loads
 document.addEventListener("DOMContentLoaded", function () {
   initGraph();
-  console.log("Network Discovery MVP Dashboard with Auto-Scan loaded");
+  console.log("Network Discovery dashboard with auto-scan loaded");
 });

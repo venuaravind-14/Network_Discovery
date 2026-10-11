@@ -1,50 +1,67 @@
-# Network Discovery MVP
+# Network Discovery
 
-A Flask + Socket.IO dashboard that discovers devices on your local network and visualizes them in real-time with Cytoscape.
+A local Flask and Socket.IO dashboard for discovering devices on a network and
+visualizing scan results in real time.
 
 ## Features
-- Real network scan using python-nmap (fallback to ping)
-- Device type inference (router, computer, mobile, hotspot, printer, media, IoT, NAS, virtual)
-- Real-time updates via WebSockets
-- Auto-scan with interval and countdown
-- Graceful scan stop support
-- JSON API: `GET /api/devices`
+
+- Discovers devices with Nmap when available, with a parallel ping fallback.
+- Infers device types from hostnames, addresses, and hardware vendor prefixes.
+- Displays devices in an interactive Cytoscape graph and a device list.
+- Supports manual scans, recurring scans, and custom network targets.
+- Exposes device history and JSON/CSV exports.
+- Optionally reports basic bandwidth data from devices that support SNMP.
+
+Only scan networks you own or are authorized to assess. Scanning results depend
+on local network configuration, host firewalls, and operating-system privileges.
+The built-in fallback assumes an IPv4 `/24` network.
 
 ## Requirements
-- Python 3.13 (use provided `network-discovery-mvp` venv) or Python 3.9+
-- Optional: nmap binary installed on your system for advanced scanning
 
-## Setup
-```bash
-# Option 1: Use provided venv (Windows PowerShell)
-# In repo root
-./network-discovery-mvp/Scripts/Activate.ps1
-pip install -r requirements.txt
+- Python 3.9 or newer.
+- Optional: Nmap installed on the system for enhanced scanning.
 
-# Option 2: Your own venv
-python -m venv .venv
-. .venv/Scripts/Activate.ps1
-pip install -r requirements.txt
+Install dependencies in a virtual environment:
+
+```powershell
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
 ```
+
+On macOS or Linux, activate the environment with
+`source .venv/bin/activate` instead.
 
 ## Run
-```bash
-# Start the app (use app_clean.py)
-python app_clean.py
-# Open http://127.0.0.1:5000
+
+```powershell
+python app.py
 ```
 
-If `python-nmap` is installed and the `nmap` binary is available, the scanner will use nmap for discovery; otherwise it falls back to parallel ping.
+Open <http://127.0.0.1:5000>. The development server listens on localhost and
+debug mode is disabled by default.
 
-## Frontend controls
-- Start Scan: triggers a one-off scan
-- Auto-Scan: toggles recurring scans at the configured interval (30–3600s)
-- Clear: resets the visualization and stats
+Optional configuration is read from environment variables:
 
-## API
-- GET `/api/devices` → `{ devices: { [ip]: {...} }, timestamp }`
+| Variable | Purpose |
+| --- | --- |
+| `FLASK_SECRET_KEY` | Persistent Flask secret; if omitted, a random key is generated for this run. |
+| `FLASK_DEBUG` | Set to `1` to enable Flask debug mode for local development. |
+| `PIHOLE_URL` | Pi-hole API URL to enable the optional blacklist endpoints. |
+| `PIHOLE_TOKEN` | Optional Pi-hole API token. |
+| `SNMP_COMMUNITY` | SNMP community string; defaults to `public`. |
 
-## Notes
-- On Windows, run terminal as Administrator to improve ARP/MAC detection with nmap.
-- Firewalls can block ICMP; results may vary depending on your network.
+Do not commit real credentials or `.env` files.
+
+## HTTP API
+
+- `GET /api/devices` — current discovered devices and timestamp.
+- `GET /api/history` — device history.
+- `GET /api/export.json` — JSON export of devices and history.
+- `GET /api/export.csv` — CSV export of devices.
+- `POST /api/scan` — start a scan; optionally pass a `targets` CIDR string or list
+  in the JSON body.
+
+The dashboard also uses Socket.IO for scan controls and live updates.
+
 

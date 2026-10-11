@@ -1,18 +1,17 @@
-# Network Discovery MVP - Python Dependencies
+# Network Discovery - Python dependencies
 # Install with: pip install -r requirements.txt
 
 # Core Flask framework
 Flask
 
-# Real-time WebSocket communication (compatible versions)
+# Real-time WebSocket communication
 Flask-SocketIO
 
-# For real network scanning (will replace mock discovery)
+# Optional Nmap-based network scanning
 python-nmap
 
-# Additional dependencies for network operations
+# Network integrations and WSGI deployment
 eventlet
 requests
 pysnmp
 gunicorn
-
